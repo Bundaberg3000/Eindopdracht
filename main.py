@@ -4,22 +4,13 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.console import Console
 from rich.text import Text
+import requests
+from dotenv import dotenv_values
+import json
 
 WELCOME_MESSAGE = Text.from_markup("[bold red]WELCOME TO THE DINNERS CHOICE APP![/bold red]", justify="center")
-console = Console()
-text = Text("Hello, World!")
-text.stylize("bold magenta", 0, 6)
-console.print(text)
 
-
-import random
-import requests
 print("[bold red]alert![/bold red] Something happened")
-print(Panel("Hello, [red]World!"))
-print(Panel.fit("Hello, [red]World!"))
-
-
-
 
 def show_main_menu():
     print("""
@@ -55,7 +46,7 @@ def show_blacklist_menu():
 
 
 def main():
-    print(Panel(WELCOME_MESSAGE))
+    print(Panel.fit(WELCOME_MESSAGE))
     while True:
         show_main_menu()
         user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
