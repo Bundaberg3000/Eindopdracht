@@ -1,16 +1,18 @@
 wat moet het doen:
 
-de applicatie is er om iemand te helpen kiezen wat te koken en een boodchappenlijstje te produceren.
+de applicatie is er om iemand te helpen kiezen wat te koken.
 
 het kan iemand laten kiezen uit 3 willekeurige gerechten die worden gesuggereerd
-het kan favorieten opslaan en daar een willekeurige selectie uit tonen om uit te kiezen.
+het kan iemand een category mee laten geven waarvan 3 willekeurige gerechten worden gesuggereerd.
+het kan favorieten opslaan en daar een willekeurige selectie uit tonen om uit te kiezen. ( alle gekozen recepten worden opgeslagen in een lijst. vanuit daar kunnen items worden toegevoegd aan favo of black)
 je kan een gerecht op de blacklist zetten zodat je als je het krijgt als suggestie wordt vermeld dat je het niet lekker vond.
-je kan zelf gerechten zoeken op cattegorie
-je kan de voedingswaarde van de gerechten laten berekenen
+
+
 
 ik ga de volgende endpoints gebruiken:
-https://api.spoonacular.com/recipes/random
-https://api.spoonacular.com/recipes/findByIngredients
+https://api.spoonacular.com/recipes/random ( )
+https://api.spoonacular.com/recipes/{id}/ingredientWidget.json
+https://api.spoonacular.com/recipes/{id}/analyzedInstructions
 
 print formatted welcome message
 
