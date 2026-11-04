@@ -1,46 +1,56 @@
-from secrets import API_KEY
+from my_secret import API_KEY
 import requests
-from rich import print, console
+from rich import print
 import json
 import list_functions
 from rich.prompt import Prompt
-from rich.console import Console
 from rich.table import Table
+import logging
 
-random_url = "https://api.spoonacular.com/recipes/random"
+logger = logging.getLogger(__name__)
 
-instructions_url = "https://api.spoonacular.com/recipes/{chosen_id}/analyzedInstructions"
 
 def handle_response(response):
     """Check de response code en filter de info met get_recipe_and_id()
     geef de gefilterde info terug"""
-
     if  response.ok:
         data = response.json()
         user_dict = get_recipe_and_id(data)
         return user_dict
     else:
-        print(f"Fout: {response.status_code} - {response.text}")
+        print(f"Error: {response.status_code} - {response.text}")
+        logging.error(f"Fout: {response.status_code} - {response.text}")
         return None
 
 def get_random_recipes(category=None):
-    """de call naar de random recipe endpoint maken evt met category.
-    met een handle_response voor de status check en filteren data. geeft de dict terug"""
-
+    """de call naar de random recipe endpoint maken evt. met category.
+    Met een handle_response voor de status check en filteren data. Geeft de dict terug"""
+    random_url = "https://api.spoonacular.com/recipes/random"
     if category is None:
-        response = requests.get(f"{random_url}?apiKey={API_KEY}&include-tags=main course&number=3")
-        user_dict = handle_response(response)
-        return user_dict
+        try:
+            response = requests.get(f"{random_url}?apiKey={API_KEY}&include-tags=main course&number=3")
+        except requests.ConnectionError:
+            print("Er lijkt geen verbinding met het internet te zijn...")
+            logging.error("Connection error")
+            return None
+        else:
+            user_dict = handle_response(response)
+            return user_dict
     else:
-        response = requests.get(f"{random_url}?apiKey={API_KEY}&number=3&include-tags=main course, {category}")
-        user_dict = handle_response(response)
-        return user_dict
+        try:
+            response = requests.get(f"{random_url}?apiKey={API_KEY}&number=3&include-tags=main course,{category}")
+        except requests.ConnectionError:
+            print("Er lijkt geen verbinding met het internet te zijn...")
+            logging.error("Connection error")
+            return None
+        else:
+            user_dict = handle_response(response)
+            return user_dict
 
 
 def get_recipe_and_id(data):
     """ De informatie die we willen gebruiken filteren uit de response
     en terug geven in een dict object"""
-
     user_number = 1
     user_dict = {}
     for recipe in data["recipes"]:
@@ -52,10 +62,11 @@ def get_recipe_and_id(data):
 
 def user_picks_recipe(user_data):
     """Door het dict loopen, checken of de recepten al in favorites of blacklist staan
-    en anders de recept titels genummerd weergeven om de gebruiker een keuze te kunnen
-    laten maken. We geven de titel terug en ook achter de schermen het ID nummer wat we
+    en anders de recepttitels genummerd weergeven om de gebruiker een keuze te kunnen
+    laten maken. We geven de titel terug en ook achter de schermen het ID-nummer wat we
     nodig hebben voor de volgende calls"""
-
+    if user_data is None:
+        return None
     for key_number, recipe_info in user_data.items():
         for recipe_id in recipe_info:
             recipe_name = recipe_info[recipe_id]
@@ -73,47 +84,54 @@ def user_picks_recipe(user_data):
     else:
         chosen_item = user_data[int(user_choice)]
         for recipe_id, recipe_name in chosen_item.items():
-            chosen_title = recipe_name
-            chosen_id = recipe_id
-        return chosen_title, int(chosen_id)
+            picked_title = recipe_name
+            picked_id = recipe_id
+        return picked_title, int(picked_id)
 
 
-def get_recipes(category=None):
+def get_recipes(category):
     """ extra functie om main beter leesbaar te houden"""
-
-    chosen_title, chosen_id = user_picks_recipe(get_random_recipes(category=None))
+    chosen_title, chosen_id = user_picks_recipe(get_random_recipes(category))
     return chosen_title, chosen_id
 
 
 def get_ingredients(chosen_id):
-    """call naar het ingredienten endpoint met show_ingredients() voor het weergeven."""
-
+    """call naar het ingrediënten endpoint met show_ingredients() voor het weergeven."""
     ingredients_url = f"https://api.spoonacular.com/recipes/{chosen_id}/ingredientWidget.json"
-    response = requests.get(f"{ingredients_url}?apiKey={API_KEY}")
-    # hier moet nog een response check
-    data = response.json()
-    show_ingredients(data)
+    try:
+        response = requests.get(f"{ingredients_url}?apiKey={API_KEY}")
+    except ConnectionError:
+        print("Er lijkt geen verbinding met het internet te zijn...")
+        logging.error("Connection error")
+    else:
+        if response.ok:
+            data = response.json()
+            show_ingredients(data)
+        else:
+            print(f"Error: {response.status_code} - {response.text}")
+            logging.error(f"Fout: {response.status_code} - {response.text}")
+
 
 def get_instructions(chosen_id):
     """call naar het instructions endpoint met show_instructions voor het weergeven."""
-
     instructions_url = f"https://api.spoonacular.com/recipes/{chosen_id}/analyzedInstructions"
-    response = requests.get(f"{instructions_url}?apiKey={API_KEY}")
-    # hier moet nog een response check
-    data = response.json()
-    show_instructions(data)
+    try:
+        response = requests.get(f"{instructions_url}?apiKey={API_KEY}")
+    except ConnectionError:
+        print("Er lijkt geen verbinding met het internet te zijn...")
+        logging.error("Connection error")
+    else:
+        if response.ok:
+            data = response.json()
+            show_instructions(data)
+        else:
+            print(f"Error: {response.status_code} - {response.text}")
+            logging.error(f"Fout: {response.status_code} - {response.text}")
 
-
-def get_fake_data():
-    """extra functie voor het besparen van api calls met ontwikkelen"""
-    with open("stored lists/instructions.json", "r") as file:
-        data = json.load(file)
-        return data
 
 def show_ingredients(data):
-    """het vorgeven van een table om de ingredienten genummerd weer te geven
+    """het vormgeven van een table om de ingrediënten genummerd weer te geven
     en her weergeven zelf"""
-
     table = Table(title="TODAY'S RECIPE")
     table.add_column("Ingredient", justify="right", style="cyan", no_wrap=True)
     table.add_column("Amount", style="magenta")
@@ -124,14 +142,20 @@ def show_ingredients(data):
         ingredient_amount = str(ingredient['amount']['metric']['value'])
         ingredient_unit = ingredient['amount']['metric']['unit']
         table.add_row(ingredient_name, ingredient_amount, ingredient_unit)
-    console = Console
     print(table)
+
+def get_ingredients_instructions(chosen_title, chosen_id):
+    """deze is zodat ik dit niet 2 keer hoef te typen in het random recipes menu.
+    """
+    list_functions.add_to_list(chosen_title, chosen_id, "history")
+    get_ingredients(chosen_id)
+    input("Press enter to continue to instructions.....")
+    get_instructions(chosen_id)
 
 
 def show_instructions(data):
-    """vormgeven van een tafel om de instructies genummmerd weer te geven en
+    """vormgeven van een tafel om de instructies genummerd weer te geven en
     het weergeven zel"""
-
     table = Table(title="TODAY'S STEPS", width=150)
     table.add_column("Step", justify="right", style="cyan", no_wrap=True)
     table.add_column("Instructions", style="magenta")
@@ -140,7 +164,6 @@ def show_instructions(data):
             step_number = str(steps['number'])
             step_instruction = steps['step']
             table.add_row(step_number, step_instruction)
-    console = Console
     print(table)
 
 

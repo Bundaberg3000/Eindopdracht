@@ -2,15 +2,19 @@
 from rich import print
 from rich.panel import Panel
 from rich.prompt import Prompt
-from rich.console import Console
 from rich.text import Text
-import requests
-from secrets import API_KEY
 import spoonacular
 import list_functions
+import logging
 
+logging.basicConfig(
+    filename="app.log",
+    level=logging.WARNING,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-WELCOME_MESSAGE = Text.from_markup("[bold red]WELCOME TO THE DINER'S CHOICE APP![/bold red]", justify="center")
+WELCOME_MESSAGE = Text.from_markup("WELCOME TO THE DINER'S CHOICE APP!", justify="center")
+EXIT_MESSAGE = Text.from_markup("THANKS FOR USING THE DINER'S CHOICE APP. HAPPY COOKING AND BON APPETIT!")
 
 def show_main_menu():
     print("""
@@ -33,13 +37,15 @@ def favorites_menu():
             case "1":
                 list_functions.show_list("favorites")
             case "2":
-                recipe_to_remove = input
-                list_functions.remove_from_list(recipe_to_remove)
+                list_functions.show_list("favorites")
+                print()
+                list_functions.remove_from_list_input("favorites")
             case "3":
-                pass
+                list_functions.show_list("history")
+                print()
+                list_functions.add_to_list_input("favorites")
             case "0":
                 return
-
 
 
 def show_random_recipes_menu():
@@ -57,13 +63,13 @@ def show_random_recipes_menu():
                 chosen_title, chosen_id = spoonacular.get_recipes(category=None)
                 if chosen_title is None:
                     return
-                clean_title = chosen_title.lower()
-                list_functions.add_to_list(clean_title, chosen_id, "history")
-                spoonacular.get_ingredients(chosen_id)
-                input("Press enter to continue to instructions.....")
-                spoonacular.get_instructions(chosen_id)
+                spoonacular.get_ingredients_instructions(chosen_title, chosen_id)
             case "2":
-                pass
+                user_choice = Prompt.ask("Enter your choice", choices=["fish", "meat", "vegetarian"])
+                chosen_title, chosen_id = spoonacular.get_recipes(user_choice)
+                if chosen_title is None:
+                    return
+                spoonacular.get_ingredients_instructions(chosen_title, chosen_id)
             case "3":
                 chosen_id = list_functions.pick_from_favorites()
                 if chosen_id is None:
@@ -78,19 +84,23 @@ def blacklist_menu():
     while True:
         print("""
 1. Show blacklist
-2. Add recipe to blacklist
-3. Remove recipe from blacklist
+2. Remove recipe from blacklist
+3. Add recipe to blacklist
 0. Return to main menu
 """)
         user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
         print()
         match user_choice:
             case "1":
-                pass
+                list_functions.show_list("blacklist")
             case "2":
-                pass
+                list_functions.show_list("blacklist")
+                print()
+                list_functions.remove_from_list_input("blacklist")
             case "3":
-                pass
+                list_functions.show_list("history")
+                print()
+                list_functions.add_to_list_input("blacklist")
             case "0":
                 return
 
@@ -108,7 +118,7 @@ def main():
             case "3":
                 show_random_recipes_menu()
             case "0":
-                #print exit message
+                print(Panel.fit(EXIT_MESSAGE))
                 exit(0)
 
 
