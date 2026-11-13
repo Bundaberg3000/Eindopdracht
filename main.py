@@ -7,13 +7,17 @@ import list_functions
 import logging
 
 WELCOME_MESSAGE = Text.from_markup("WELCOME TO THE DINER'S CHOICE APP!", justify="center")
-EXIT_MESSAGE = Text.from_markup("THANKS FOR USING THE DINER'S CHOICE APP. HAPPY COOKING AND BON APPETIT!")
+EXIT_MESSAGE = Text.from_markup("THANKS FOR USING THE DINER'S CHOICE APP. HAPPY COOKING AND BON APPETIT!", justify="center")
 
 logging.basicConfig(
     filename="app.log",
     level=logging.WARNING,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+def get_menu_choice():
+    choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
+    return choice
 
 def show_main_menu():
     print("""
@@ -28,7 +32,7 @@ def main():
     print(Panel.fit(WELCOME_MESSAGE))
     while True:
         show_main_menu()
-        user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
+        user_choice = get_menu_choice()
         match user_choice:
             case "1":
                 favorites_menu()
@@ -49,7 +53,7 @@ def favorites_menu():
 3. Add recipe to favorites
 0. Return to main menu
 """)
-        user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
+        user_choice = get_menu_choice()
         match user_choice:
             case "1":
                 list_functions.show_list("favorites")
@@ -73,7 +77,7 @@ def show_random_recipes_menu():
 3. Show 3 recipes from favorites list
 0. Return to main menu
 """)
-        user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
+        user_choice = get_menu_choice()
         print()
         match user_choice:
             case "1":
@@ -106,7 +110,7 @@ def blacklist_menu():
 3. Add recipe to blacklist
 0. Return to main menu
 """)
-        user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
+        user_choice = get_menu_choice()
         print()
         match user_choice:
             case "1":

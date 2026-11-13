@@ -7,3 +7,23 @@
 2026-11-04 13:46:22,346 - ERROR - Connection error
 2026-11-04 13:46:23,288 - ERROR - Connection error
 2026-11-04 13:46:24,165 - ERROR - Connection error
+2026-11-13 10:58:04,575 - ERROR - Failed to parse JSON correctly
+Traceback (most recent call last):
+  File "C:\Users\bramd\PycharmProjects\Eindopdracht\list_functions.py", line 16, in load_json_file
+    data = json.load(file)
+  File "C:\Users\bramd\AppData\Local\Python\pythoncore-3.15-64\Lib\json\__init__.py", line 306, in load
+    return loads(fp.read(),
+        cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook,
+        array_hook=array_hook, **kw)
+  File "C:\Users\bramd\AppData\Local\Python\pythoncore-3.15-64\Lib\json\__init__.py", line 371, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Users\bramd\AppData\Local\Python\pythoncore-3.15-64\Lib\json\decoder.py", line 358, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\bramd\AppData\Local\Python\pythoncore-3.15-64\Lib\json\decoder.py", line 374, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 228 (char 227)
