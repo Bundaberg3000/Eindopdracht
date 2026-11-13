@@ -24,6 +24,23 @@ def show_main_menu():
 """)
 
 
+def main():
+    print(Panel.fit(WELCOME_MESSAGE))
+    while True:
+        show_main_menu()
+        user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
+        match user_choice:
+            case "1":
+                favorites_menu()
+            case "2":
+                blacklist_menu()
+            case "3":
+                show_random_recipes_menu()
+            case "0":
+                print(Panel.fit(EXIT_MESSAGE))
+                exit(0)
+
+
 def favorites_menu():
     while True:
         print("""
@@ -104,23 +121,6 @@ def blacklist_menu():
                 list_functions.add_to_list_input("blacklist")
             case "0":
                 return
-
-
-def main():
-    print(Panel.fit(WELCOME_MESSAGE))
-    while True:
-        show_main_menu()
-        user_choice = Prompt.ask("Enter your choice", choices=["1", "2", "3", "0"])
-        match user_choice:
-            case "1":
-                favorites_menu()
-            case "2":
-                blacklist_menu()
-            case "3":
-                show_random_recipes_menu()
-            case "0":
-                print(Panel.fit(EXIT_MESSAGE))
-                exit(0)
 
 
 main()

@@ -22,31 +22,25 @@ def handle_response(response):
         logging.error(f"Fout: {response.status_code} - {response.text}")
         return None
 
+
 def get_random_recipes(category=None):
     """de call naar de random recipe endpoint maken evt. met category.
     Met een handle_response voor de status check en filteren data. Geeft de dict terug"""
     random_url = "https://api.spoonacular.com/recipes/random"
+    categories = ["main course"]
 
-    if category is None:
-        try:
-            response = requests.get(f"{random_url}?apiKey={API_KEY}&include-tags=main course&number=3")
-        except requests.ConnectionError:
-            print("Er lijkt geen verbinding met het internet te zijn...")
-            logging.error("Connection error")
-            return None
-        else:
-            user_dict = handle_response(response)
-            return user_dict
-    else:
-        try:
-            response = requests.get(f"{random_url}?apiKey={API_KEY}&number=3&include-tags=main course,{category}")
-        except requests.ConnectionError:
-            print("Er lijkt geen verbinding met het internet te zijn...")
-            logging.error("Connection error")
-            return None
-        else:
-            user_dict = handle_response(response)
-            return user_dict
+    if category is not None:
+        categories.append(category)
+    params = {'apiKey': API_KEY, "number": "3", "include-tags": ",".join(categories)}
+
+    try:
+        response = requests.get(random_url, params=params)
+        return handle_response(response)
+    except requests.ConnectionError:
+        print("Er lijkt geen verbinding met het internet te zijn...")
+        logging.error("Connection error")
+        return None
+
 
 
 def get_recipe_and_id(data):
@@ -165,8 +159,8 @@ def show_instructions(data):
     """vormgeven van een tafel om de instructies genummerd weer te geven en
     het weergeven zel"""
 
-    table = Table(title="TODAY'S STEPS", width=150)
-    table.add_column("Step", justify="right", style="cyan", no_wrap=True)
+    table = Table(title="TODAY'S STEPS")
+    table.add_column("Step", justify="right", style="cyan")
     table.add_column("Instructions", style="magenta")
     for items in data:
         for steps in items['steps']:
